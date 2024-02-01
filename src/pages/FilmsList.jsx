@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button, Modal } from 'react-bootstrap';
-import FilmDetails from './FilmDetails';
 import { faFilm } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -22,20 +21,42 @@ export default function FilmsList() {
   }, []);
   
   const [showModal, setShowModal] = useState(false);
-  const handleOpenModal = () => setShowModal(true);
+  const [selectedFilm, setSelectedFilm] = useState(null);
+  const [filmDetails, setFilmDetails] = useState({});
+  
+  const handleOpenModal = async (film) => {
+    setSelectedFilm(film);
+    setShowModal(true);
+    try {
+      const response = await fetch(`http://localhost:3001/filmDetails/${film.film_id}`);
+      const data = await response.json();
+      setFilmDetails(data);
+    } catch (error) {
+      console.error('Error fetching film details:', error);
+    }
+  };
   const handleCloseModal = () => setShowModal(false);
 
-  const DetailsModal = ({ film }) => {
+  const DetailsModal = () => {
     return (
-      <Modal size="lg" centered show={showModal} onHide={() => setShowModal(false)}>
+      <Modal size="lg" centered show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>{film.title}</Modal.Title>
+          <Modal.Title>{filmDetails.title || 'Loading...'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {film.film_id}
+        {filmDetails.description ? (
+          <>
+            <p>{filmDetails.description}</p>
+            <p className='lead'>{filmDetails.release_year}</p>
+            <p className='text-success'>{filmDetails.rental_rate}</p>
+            <p>{filmDetails.special_features}</p>
+          </>
+        ) : (
+          <p>Loading details...</p>
+        )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" onClick={handleCloseModal}>
             Close
           </Button>
         </Modal.Footer>
@@ -49,9 +70,9 @@ export default function FilmsList() {
       <h2>Top 5 Trending Films</h2>
       <Row className='justify-content-center'>
         {films.map((film) => (
-          <div className="">
+          <div key={film.film_id}>
             <Col className='my-2' lg="4" md="6" sm="12">
-              <div className='border border-danger rounded p-3' key={film.film_id} >
+              <div className='border border-danger rounded p-3'>
                 <h3>{film.title}</h3> - {film.name}
                 <br />
                 <Button className='mt-4' variant="outline-danger" onClick={() => handleOpenModal(film)} >
@@ -59,11 +80,10 @@ export default function FilmsList() {
                 </Button>
               </div>
             </Col>
-            <DetailsModal film={film}></DetailsModal>
           </div>
         ))}
       </Row>
+      <DetailsModal></DetailsModal>
     </Container>
   );
 };
-
