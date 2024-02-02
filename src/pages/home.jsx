@@ -1,20 +1,16 @@
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import FilmsList from './FilmsList';
+import React, { useState, useEffect } from 'react';
+import { Container, Col, Row, Button, Modal } from 'react-bootstrap';
+import TopFiveActors from '/src/components/TopFiveActors';
+import TopFiveMovies from '/src/components/TopFiveMovies';
 
-import Customer from './customer';
-export default function HomePage() {
-    return(
-        <Container>
-            <Row>
-                <Col>
-                    
-                    
-                    <FilmsList />
-                </Col>
-            </Row>
+export default function Home() {
 
-        </Container>
-    );
-}
+  return (
+    <>
+      <Container>
+        <TopFiveMovies />
+        <TopFiveActors />
+      </Container>
+    </>
+  );
+};

@@ -3,7 +3,6 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 
 export default function Customer() {
 
-
     return (
         <>
             <Container>
