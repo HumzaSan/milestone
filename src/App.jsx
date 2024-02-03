@@ -12,15 +12,12 @@ function App() {
 
   return (
     <>
-      <Container fluid>
         <NavBar></NavBar>
         <Routes>
           <Route path="/" element={<HomePage />}></Route>
           <Route path="/movies" element={<Movies />}></Route>
           <Route path="/customer" element={<Customer />}></Route>
         </Routes>
-      </Container>
-
     </>
   )
 }

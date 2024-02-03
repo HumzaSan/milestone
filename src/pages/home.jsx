@@ -7,7 +7,7 @@ export default function Home() {
 
   return (
     <>
-      <Container>
+      <Container fluid>
         <TopFiveMovies />
         <TopFiveActors />
       </Container>
