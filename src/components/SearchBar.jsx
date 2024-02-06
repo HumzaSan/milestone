@@ -6,13 +6,15 @@ export default function SearchBar({ query }) {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [filterByActor, setFilterByActor] = useState(false);
+    const [filterByGenra, setFilterByGenra] = useState(false);
+    const [modal, setShowModal] = useState(false);
 
     useEffect(() => {
-        if (movieTitle || filterByActor) {
+        if (movieTitle || filterByActor || filterByGenra) { 
             setIsLoading(true);
             fetchSearchResults();
         }
-    }, [movieTitle, filterByActor]);
+    }, [movieTitle, filterByActor, filterByGenra]);
 
     const handleSearch = () => {
         fetchSearchResults();
@@ -24,6 +26,12 @@ export default function SearchBar({ query }) {
         }
     };
 
+    const handleGenraFilter = async () => {
+        if (movieTitle || filterByGenra) {
+            setFilterByGenra(!filterByGenra);
+        }
+    };
+
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
 
@@ -31,6 +39,7 @@ export default function SearchBar({ query }) {
         if (!inputValue) {
             setMovieTitle('');
             setFilterByActor(false);
+            setFilterByGenra(false);
             setSearchResults([]);
         } else {
             setMovieTitle(inputValue);
@@ -42,6 +51,8 @@ export default function SearchBar({ query }) {
             let apiUrl = '';
             if (filterByActor) {
                 apiUrl = `http://localhost:3001/searchMoviesActor/${encodeURIComponent(movieTitle)}`;
+            } else if (filterByGenra) {
+                apiUrl = `http://localhost:3001/searchMoviesGenra/${encodeURIComponent(movieTitle)}`;
             } else {
                 apiUrl = `http://localhost:3001/searchMoviesTitle/${encodeURIComponent(movieTitle)}`;
             }
@@ -68,6 +79,8 @@ export default function SearchBar({ query }) {
         }
     };
 
+    const toggle = () => setShowModal(!modal);
+
     return (
         <Row className='justify-content-center'>
             <Col md={8}>
@@ -88,6 +101,14 @@ export default function SearchBar({ query }) {
                             id="actorFilter"
                             checked={filterByActor}
                             onChange={handleActorFilter}
+                        />
+                        <Form.Check
+                            type="checkbox"
+                            label="Filter by genra"
+                            className='mx-4'
+                            id="actorGenra"
+                            checked={filterByGenra}
+                            onChange={handleGenraFilter}
                         />
                         <Button variant="outline-danger" id="search-movies-button" onClick={handleSearch}>
                             Find
