@@ -38,7 +38,6 @@ export default function SearchBar({ query }) {
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
 
-        // Reset the form (including actor filter) if the movie title is empty
         if (!inputValue) {
             setMovieTitle('');
             setFilterByActor(false);
@@ -66,7 +65,6 @@ export default function SearchBar({ query }) {
 
             const response = await fetch(apiUrl);
 
-            // Check if the response status is OK (200)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
