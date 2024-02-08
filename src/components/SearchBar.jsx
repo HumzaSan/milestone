@@ -10,6 +10,7 @@ export default function SearchBar({ query }) {
     const [modal, setShowModal] = useState(false);
     const [selectedFilm, setSelectedFilm] = useState(null);
     const [filmDetails, setFilmDetails] = useState({});
+    const [customerId, setCustomerId] = useState('');
 
     useEffect(() => {
         if (movieTitle || filterByActor || filterByGenre) {
@@ -48,6 +49,10 @@ export default function SearchBar({ query }) {
         }
     };
 
+    const handleCustomerIdChange = (e) => {
+        setCustomerId(e.target.value);
+    };
+
     const fetchSearchResults = async () => {
         try {
             let apiUrl = '';
@@ -81,7 +86,6 @@ export default function SearchBar({ query }) {
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
     const showMovieModal = async (film) => {
         setSelectedFilm(film);
         setShowModal(true);
@@ -95,6 +99,23 @@ export default function SearchBar({ query }) {
 
     };
 
+    // rent button ///////////////
+    const rentCustomerMovie = async (filmDetails) => {
+        const customerInfo = {
+            film_id: filmDetails.film_id,
+            customer_id: customerId
+        };
+        const result = await fetch('http://localhost:3001/customerMovieRental/${customer_id}/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(customerInfo)
+        });
+        console.log(result)
+        const data = await result.json()
+    };
+    ///////////////////////////////
     const FilmDetailsModal = () => {
         return (
             <Modal size="lg" centered show={modal} onHide={handleCloseModal}>
@@ -118,6 +139,13 @@ export default function SearchBar({ query }) {
                             </ListGroup>
                                 
                             </Col>
+                            {/* rent button associated */}
+                            <Form.Group>
+                                <Row>
+                                    <Form.Control id='CustID' placeholder='Customer ID' value={customerId} onChange={handleCustomerIdChange}></Form.Control>
+                                    <Button onClick={() => rentCustomerMovie(filmDetails)}>Rent</Button>
+                                </Row>
+                            </Form.Group>
                         </Row>
                     ) : (
                         <p>Loading film details...</p>
