@@ -10,7 +10,7 @@ export default function Search() {
     };
 
     return (
-        <Container>
+        <Container fluid>
             <SearchBar onSearch={handleSearch} />
         </Container>
     );

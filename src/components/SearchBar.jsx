@@ -163,11 +163,11 @@ export default function SearchBar({ query }) {
 
     return (
         <>
-            <h1 className="text-danger my-2">Search Movies</h1>
             <Row className='justify-content-center'>
-                <Col>
+                <Col sm={11}>
+                    <h1 className="text-danger my-2">Search Movies</h1>
                     <Form className='pt-2 pb-4'>
-                        <InputGroup size="lg" className="align-items-center">
+                        {/* <InputGroup size="lg" className="align-items-center"> */}
                             <Form.Control
                                 id='filmSearchBar'
                                 placeholder="Film Search"
@@ -195,7 +195,7 @@ export default function SearchBar({ query }) {
                             <Button variant="outline-danger" id="search-movies-button" onClick={handleSearch}>
                                 Find
                             </Button>
-                        </InputGroup>
+                        {/* </InputGroup> */}
                     </Form>
                     <div>
                         {isLoading && <Spinner animation="border" role="status">

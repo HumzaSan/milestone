@@ -15,7 +15,7 @@ export default function NavBar() {
           <Navbar.Toggle aria-controls="responsive-navbar-nav" className='bg-warning' />
           <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-end">
             <Nav>
-              <Nav.Link href="/search" className=' text-warning'>Search</Nav.Link>
+              <Nav.Link href="/search" className=' text-warning'>Movies</Nav.Link>
               <Nav.Link href="/customer" className=' text-warning'>Customer</Nav.Link>
             </Nav>
           </Navbar.Collapse>
