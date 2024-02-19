@@ -7,13 +7,14 @@ export default function Customer() {
     const [searchResults, setSearchResults] = useState([]);
     const [filterByID, setFilterByID] = useState(false);
     const [filterByLName, setFilterByLName] = useState(false);
+    const [filterByFName, setFilterByFName] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // State to track loading status
     const [currentPage, setCurrentPage] = useState(1);
     const [customersPerPage] = useState(50);
 
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
-
+    
         if (!inputValue) {
             setCustomerSearch('');
             setFilterByID(false);
@@ -22,6 +23,70 @@ export default function Customer() {
         } else {
             setCustomerSearch(inputValue);
         }
+    };
+    
+
+    useEffect(() => {
+        if (filterByFName || filterByID || filterByLName) {
+            setIsLoading(true);
+            fetchSearchResults();
+        }
+    }, [customerSearch , filterByID, filterByLName]);
+
+    const handleSearch = () => {
+        fetchSearchResults();
+    };
+    
+    const fetchSearchResults = async () => {
+        setIsLoading(true); // Ensure loading state is set at the beginning
+        try {
+            let apiUrl = '';
+            // Explicitly handle all cases
+            if (filterByID) {
+                apiUrl = `http://localhost:3001/filterByCustomersID/${encodeURIComponent(customerSearch)}`;
+            } else if (filterByFName) {
+                apiUrl = `http://localhost:3001/filterByCustomersFirstName/${encodeURIComponent(customerSearch)}`;
+            } else if (filterByLName) {
+                apiUrl = `http://localhost:3001/filterByCustomersLastName/${encodeURIComponent(customerSearch)}`;
+            } else {
+                // Default to searching by first name if no filter is selected
+                apiUrl = `http://localhost:3001/filterByCustomersFirstName/${encodeURIComponent(customerSearch)}`;
+                setFilterByFName(true); // Ensure filterByFName is set for default behavior
+            }
+    
+            console.log(`Fetching data from URL: ${apiUrl}`); // Debugging log
+    
+            const response = await fetch(apiUrl);
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            console.log('Search Results:', data); // Debugging log
+    
+            if (data.length === 0) {
+                setSearchResults([]);
+            } else {
+                setSearchResults(data);
+            }
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleIDFilter = () => {
+        setFilterByID(!filterByID);
+        setFilterByLName(false);
+        setFilterByFName(false);
+    };
+
+    const handleCustomerLNameFilter = () => {
+        setFilterByLName(!filterByLName);
+        setFilterByID(false);
+        setFilterByFName(false);
     };
 
     useEffect(() => {
@@ -68,13 +133,32 @@ export default function Customer() {
                             <InputGroup size="lg" className="align-items-center">
                                 <Form.Control
                                     id='searchCustomer'
-                                    placeholder="Customer ID / Name"
-                                    aria-label="Search Movies"
-                                    aria-describedby=" "
+                                    placeholder="Customer First Name"
+                                    aria-label=""
+                                    aria-describedby="customerNameFilter"
                                     value={customerSearch}
                                     onChange={handleInputChange}
                                 />
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Filter by ID"
+                                    className='mx-4'
+                                    id="customerIDFilter"
+                                    checked={filterByID}
+                                    onChange={handleIDFilter}
+                                />
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Filter by Last Name"
+                                    className='mx-4'
+                                    id="customerNameFilter"
+                                    checked={filterByLName}
+                                    onChange={handleCustomerLNameFilter}
+                                />
                             </InputGroup>
+                            <Button variant="outline-danger" id="search-customer-button" onClick={handleSearch}>
+                                Find
+                            </Button>
                         </Form>
 
                     </Col>
