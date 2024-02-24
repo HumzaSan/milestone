@@ -11,10 +11,11 @@ export default function Customer() {
     const [isLoading, setIsLoading] = useState(false); // State to track loading status
     const [currentPage, setCurrentPage] = useState(1);
     const [customersPerPage] = useState(50);
+    const [deleteCustomer, setDeleteCustomer] = useState(false);
 
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
-    
+
         if (!inputValue) {
             setCustomerSearch('');
             setFilterByID(false);
@@ -24,19 +25,19 @@ export default function Customer() {
             setCustomerSearch(inputValue);
         }
     };
-    
+
 
     useEffect(() => {
         if (filterByFName || filterByID || filterByLName) {
             setIsLoading(true);
             fetchSearchResults();
         }
-    }, [customerSearch , filterByID, filterByLName]);
+    }, [customerSearch, filterByID, filterByLName]);
 
     const handleSearch = () => {
         fetchSearchResults();
     };
-    
+
     const fetchSearchResults = async () => {
         setIsLoading(true); // Ensure loading state is set at the beginning
         try {
@@ -53,18 +54,18 @@ export default function Customer() {
                 apiUrl = `http://localhost:3001/filterByCustomersFirstName/${encodeURIComponent(customerSearch)}`;
                 setFilterByFName(true); // Ensure filterByFName is set for default behavior
             }
-    
+
             console.log(`Fetching data from URL: ${apiUrl}`); // Debugging log
-    
+
             const response = await fetch(apiUrl);
-    
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-    
+
             const data = await response.json();
             console.log('Search Results:', data); // Debugging log
-    
+
             if (data.length === 0) {
                 setSearchResults([]);
             } else {
@@ -88,6 +89,26 @@ export default function Customer() {
         setFilterByID(false);
         setFilterByFName(false);
     };
+
+    const handleDeleteCustomer = async (customerID) => {
+        try {
+            const response = await fetch(`http://localhost:3001/deleteCustomerById/${encodeURIComponent(customerID)}`, {
+                method: 'DELETE', // Assuming the backend expects a DELETE request for deleting a customer
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            console.log(`Customer with ID: ${customerID} deleted successfully.`);
+            // Optionally, refresh the search results to reflect the deletion
+            setSearchResults(searchResults.filter(customer => customer.customer_id !== customerID));
+        } catch (error) {
+            console.error('Error deleting customer:', error);
+        }
+    }
+
+    const handleAddCustomer = async () => {
+
+    }
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -164,6 +185,14 @@ export default function Customer() {
                     </Col>
                 </Row>
                 <Row>
+                    <Col>
+                        <Button variant="outline-primary" id="add-customer-button" onClick={handleAddCustomer}>
+                            Add Customer
+                        </Button>
+                    </Col>
+                </Row>
+
+                <Row>
                     {isLoading ? (
                         <Spinner animation="border" role="status">
                             <span className="visually-hidden">Loading...</span>
@@ -175,17 +204,22 @@ export default function Customer() {
                                     <th className='text-center'>Id</th>
                                     <th className='text-center'>First Name</th>
                                     <th className='text-center'>Last Name</th>
-                                    <th className="text-center">View Details</th>
-                                    <th className="text-center">Edit Customer</th>
-                                    <th className="text-center">Delete Customer</th>
+                                    <th className="text-center">Menu</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {currentCustomers.map((customer, index) => (
-                                    <tr key={index} className='align-items-center'>
+                                    <tr key={index} className='align-middle'>
                                         <td>{customer.customer_id}</td>
                                         <td className='text-danger h6'>{customer.first_name}</td>
                                         <td className='text-center'>{customer.last_name}</td>
+                                        <td className='justify-content-center d-flex '>
+                                            <div className="d-flex gap-1 py-1">
+                                                <Button variant='outline-success' className='m-1 px-5'>view</Button>
+                                                <Button variant='outline-dark' className='m-1 px-5'>edit</Button>
+                                                <Button variant='outline-danger' className='m-1 px-5' onClick={() => handleDeleteCustomer(customer.customer_id)}>delete</Button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
