@@ -15,6 +15,13 @@ export default function Customer() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({});
     const [showModal, setShowModal] = useState(false);
+    const [userResponses, setUserResponses] = useState({
+        address: '',
+        district: '',
+        city: '',
+        postalCode: '',
+        phoneNumber: '',
+    });
 
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
@@ -112,7 +119,7 @@ export default function Customer() {
     const handleAddCustomer = async () => {
         setFormData({});
         setStep(1);
-        setShowModal(true);
+        setShowModal(false);
     }
 
     const handleAddUser = () => {
@@ -128,18 +135,27 @@ export default function Customer() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(userResponses),
             });
-    
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-    
+
             console.log('Responses saved successfully.');
+            setShowModal(false); // Close the modal after successful save
         } catch (error) {
             console.error('Error saving responses:', error);
         }
     };
+
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setUserResponses((prevResponses) => ({
+          ...prevResponses,
+          [id]: value,
+        }));
+      };
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -175,7 +191,7 @@ export default function Customer() {
     }
 
 
-    // work on this customer video movie modal
+    // work on this customer details modal
     const showCustomerModal = async (film) => {
         // setSelectedFilm(film);
         setShowModal(true);
@@ -204,13 +220,13 @@ export default function Customer() {
                                 <p className='mt-2'><b>Special Features:</b> {filmDetails.special_features}</p>
                             </Col>
                             <Col>
-                            <ListGroup variant="flush">
-                                <ListGroup.Item><b>Release Year</b> {filmDetails.release_year}</ListGroup.Item>
-                                <ListGroup.Item><b>Genre</b> {filmDetails.name}</ListGroup.Item>
-                                <ListGroup.Item><b>Rating</b> {filmDetails.rating}</ListGroup.Item>
-                                <ListGroup.Item><b>Rental Rate</b> <span className="text-success">${filmDetails.rental_rate}</span></ListGroup.Item>
-                            </ListGroup>
-                                
+                                <ListGroup variant="flush">
+                                    <ListGroup.Item><b>Release Year</b> {filmDetails.release_year}</ListGroup.Item>
+                                    <ListGroup.Item><b>Genre</b> {filmDetails.name}</ListGroup.Item>
+                                    <ListGroup.Item><b>Rating</b> {filmDetails.rating}</ListGroup.Item>
+                                    <ListGroup.Item><b>Rental Rate</b> <span className="text-success">${filmDetails.rental_rate}</span></ListGroup.Item>
+                                </ListGroup>
+
                             </Col>
                             {/* rent button associated */}
                             <Form.Group>
@@ -232,7 +248,7 @@ export default function Customer() {
             </Modal>
         );
     }
-//////////////////////////////////////
+    //////////////////////////////////////
     return (
         <>
             <Container>
@@ -293,23 +309,48 @@ export default function Customer() {
                                 {/* Add input fields for 5 responses */}
                                 <Form.Group controlId="addressResponse">
                                     <Form.Label>Address</Form.Label>
-                                    <Form.Control type="text" placeholder="Enter your address" />
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter your address"
+                                        value={userResponses.address}
+                                        onChange={handleChange}
+                                    />
                                 </Form.Group>
                                 <Form.Group controlId="districtResponse">
                                     <Form.Label>District</Form.Label>
-                                    <Form.Control type="text" placeholder="Enter your district" />
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter your district"
+                                        value={userResponses.district}
+                                        onChange={handleChange}
+                                    />
                                 </Form.Group>
                                 <Form.Group controlId="cityResponse">
                                     <Form.Label>City</Form.Label>
-                                    <Form.Control type="text" placeholder="Enter your city" />
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter your city"
+                                        value={userResponses.city}
+                                        onChange={handleChange}
+                                    />
                                 </Form.Group>
                                 <Form.Group controlId="postalResponse">
                                     <Form.Label>Postal Code</Form.Label>
-                                    <Form.Control type="text" placeholder="Enter your zip-code" />
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter your zip-code"
+                                        value={userResponses.postalCode}
+                                        onChange={handleChange}
+                                    />
                                 </Form.Group>
                                 <Form.Group controlId="phoneResponse">
                                     <Form.Label>Phone Number</Form.Label>
-                                    <Form.Control type="text" placeholder="Enter your phone number" />
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter your phone number"
+                                        value={userResponses.phoneNumber}
+                                        onChange={handleChange}
+                                    />
                                 </Form.Group>
                             </Modal.Body>
                             <Modal.Footer>
