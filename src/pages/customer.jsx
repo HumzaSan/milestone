@@ -1,4 +1,4 @@
-import { Modal, Row, Form, InputGroup, Button, Col, Table, Spinner, ListGroup, Container, Pagination } from 'react-bootstrap';
+import { Modal, Row, Form, InputGroup, Button, Col, Table, Spinner, ListGroup, Container, Pagination, ProgressBar } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 // import axios from 'axios'; // Assuming you are using axios for HTTP requests
 
@@ -12,6 +12,9 @@ export default function Customer() {
     const [currentPage, setCurrentPage] = useState(1);
     const [customersPerPage] = useState(50);
     const [deleteCustomer, setDeleteCustomer] = useState(false);
+    const [step, setStep] = useState(1);
+    const [formData, setFormData] = useState({});
+    const [showModal, setShowModal] = useState(false);
 
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
@@ -107,8 +110,36 @@ export default function Customer() {
     }
 
     const handleAddCustomer = async () => {
-
+        setFormData({});
+        setStep(1);
+        setShowModal(true);
     }
+
+    const handleAddUser = () => {
+        setFormData({});
+        setStep(1);
+        setShowModal(true);
+    };
+
+    const handleSaveResponses = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/addNewCustomerInfo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            console.log('Responses saved successfully.');
+        } catch (error) {
+            console.error('Error saving responses:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -143,6 +174,65 @@ export default function Customer() {
         pageNumbers.push(i);
     }
 
+
+    // work on this customer video movie modal
+    const showCustomerModal = async (film) => {
+        // setSelectedFilm(film);
+        setShowModal(true);
+        try {
+            const response = await fetch(`http://localhost:3001/modalFilmDetails/${film.film_id}`);
+            const data = await response.json();
+            CsutomerDetailsModal(data);
+        } catch (error) {
+            console.error('Error fetching film details:', error);
+        }
+
+    };
+
+    const CsutomerDetailsModal = () => {
+        return (
+            <Modal size="lg" centered show={modal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{filmDetails.title || 'Loading...'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {filmDetails.description ? (
+                        <Row className='align-items-center'>
+                            <Col>
+                                <h5>Description:</h5> {filmDetails.description}
+                                <h5 className='my-2'>Cast: </h5>{filmDetails.actor_names}
+                                <p className='mt-2'><b>Special Features:</b> {filmDetails.special_features}</p>
+                            </Col>
+                            <Col>
+                            <ListGroup variant="flush">
+                                <ListGroup.Item><b>Release Year</b> {filmDetails.release_year}</ListGroup.Item>
+                                <ListGroup.Item><b>Genre</b> {filmDetails.name}</ListGroup.Item>
+                                <ListGroup.Item><b>Rating</b> {filmDetails.rating}</ListGroup.Item>
+                                <ListGroup.Item><b>Rental Rate</b> <span className="text-success">${filmDetails.rental_rate}</span></ListGroup.Item>
+                            </ListGroup>
+                                
+                            </Col>
+                            {/* rent button associated */}
+                            <Form.Group>
+                                <Row>
+                                    <Form.Control id='CustID' placeholder='Customer ID' value={customerId} onChange={handleCustomerIdChange}></Form.Control>
+                                    <Button onClick={() => rentCustomerMovie(filmDetails)}>Rent</Button>
+                                </Row>
+                            </Form.Group>
+                        </Row>
+                    ) : (
+                        <p>Loading film details...</p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+//////////////////////////////////////
     return (
         <>
             <Container>
@@ -189,8 +279,55 @@ export default function Customer() {
                         <Button variant="outline-primary" id="add-customer-button" onClick={handleAddCustomer}>
                             Add Customer
                         </Button>
-                    </Col>
-                </Row>
+                    </Col >
+                    <Col>
+                        <Button variant="outline-primary" id="add-customer-button" onClick={handleAddUser}>
+                            Add user
+                        </Button>
+                        {/* this is for the customer */}
+                        <Modal show={showModal} onHide={() => setShowModal(false)}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Enter User Responses</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {/* Add input fields for 5 responses */}
+                                <Form.Group controlId="addressResponse">
+                                    <Form.Label>Address</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter your address" />
+                                </Form.Group>
+                                <Form.Group controlId="districtResponse">
+                                    <Form.Label>District</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter your district" />
+                                </Form.Group>
+                                <Form.Group controlId="cityResponse">
+                                    <Form.Label>City</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter your city" />
+                                </Form.Group>
+                                <Form.Group controlId="postalResponse">
+                                    <Form.Label>Postal Code</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter your zip-code" />
+                                </Form.Group>
+                                <Form.Group controlId="phoneResponse">
+                                    <Form.Label>Phone Number</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter your phone number" />
+                                </Form.Group>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={() => setShowModal(false)}>
+                                    Close
+                                </Button>
+                                <Button variant="primary" onClick={handleSaveResponses}>
+                                    Save Responses
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+
+
+
+
+
+                    </Col >
+                </Row >
 
                 <Row>
                     {isLoading ? (
@@ -215,7 +352,8 @@ export default function Customer() {
                                         <td className='text-center'>{customer.last_name}</td>
                                         <td className='justify-content-center d-flex '>
                                             <div className="d-flex gap-1 py-1">
-                                                <Button variant='outline-success' className='m-1 px-5'>view</Button>
+                                                <Button variant='outline-success' className='m-1 px-5' onClick={() => showCustomerModal(customer)}>view</Button>
+                                                {/* <CsutomerDetailsModal></CsutomerDetailsModal> */}
                                                 <Button variant='outline-dark' className='m-1 px-5'>edit</Button>
                                                 <Button variant='outline-danger' className='m-1 px-5' onClick={() => handleDeleteCustomer(customer.customer_id)}>delete</Button>
                                             </div>
@@ -235,7 +373,7 @@ export default function Customer() {
                         ))}
                     </Pagination>
                 </Row>
-            </Container>
+            </Container >
         </>
     );
 };
