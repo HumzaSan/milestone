@@ -15,6 +15,9 @@ export default function Customer() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({});
     const [showModal, setShowModal] = useState(false);
+    const [showCustomerDetailsModal, setShowCustomerDetailsModal] = useState(false);
+    const [customerDetails, setCustomerDetails] = useState({});
+    const [dummy, setDummy] = useState({});
     const [userResponses, setUserResponses] = useState({
         address: '',
         district: '',
@@ -122,13 +125,13 @@ export default function Customer() {
         setShowModal(false);
     }
 
-    const handleAddUser = () => {
+    const handleAddAddress = () => {
         setFormData({});
         setStep(1);
         setShowModal(true);
     };
 
-    const handleSaveResponses = async () => {
+    const handleSaveAddress = async () => {
         try {
             const response = await fetch('http://localhost:3001/addNewCustomerInfo', {
                 method: 'POST',
@@ -152,10 +155,10 @@ export default function Customer() {
     const handleChange = (e) => {
         const { id, value } = e.target;
         setUserResponses((prevResponses) => ({
-          ...prevResponses,
-          [id]: value,
+            ...prevResponses,
+            [id]: value,
         }));
-      };
+    };
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -192,53 +195,70 @@ export default function Customer() {
 
 
     // work on this customer details modal
-    const showCustomerModal = async (film) => {
-        // setSelectedFilm(film);
-        setShowModal(true);
+    const showCustomerModal = async (customer) => {
+        setCustomerDetails(customer);
+        setShowCustomerDetailsModal(true);
         try {
-            const response = await fetch(`http://localhost:3001/modalFilmDetails/${film.film_id}`);
+            const response = await fetch(`http://localhost:3001/getCustomerDetails/${customer.customer_id}`);
             const data = await response.json();
-            CsutomerDetailsModal(data);
+            console.log("this is customer details: ", data);
+            setDummy(data);
+            CustomerDetailsModal(data);
         } catch (error) {
-            console.error('Error fetching film details:', error);
+            console.error('Error fetching customer details:', error);
         }
 
     };
 
-    const CsutomerDetailsModal = () => {
+    const handleCloseModal = () => setShowCustomerDetailsModal(false);
+
+    const CustomerDetailsModal = () => {
         return (
-            <Modal size="lg" centered show={modal} onHide={handleCloseModal}>
+            <Modal size="lg" centered show={showCustomerDetailsModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{filmDetails.title || 'Loading...'}</Modal.Title>
+                    <Modal.Title>Customer Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {filmDetails.description ? (
-                        <Row className='align-items-center'>
-                            <Col>
-                                <h5>Description:</h5> {filmDetails.description}
-                                <h5 className='my-2'>Cast: </h5>{filmDetails.actor_names}
-                                <p className='mt-2'><b>Special Features:</b> {filmDetails.special_features}</p>
-                            </Col>
-                            <Col>
-                                <ListGroup variant="flush">
-                                    <ListGroup.Item><b>Release Year</b> {filmDetails.release_year}</ListGroup.Item>
-                                    <ListGroup.Item><b>Genre</b> {filmDetails.name}</ListGroup.Item>
-                                    <ListGroup.Item><b>Rating</b> {filmDetails.rating}</ListGroup.Item>
-                                    <ListGroup.Item><b>Rental Rate</b> <span className="text-success">${filmDetails.rental_rate}</span></ListGroup.Item>
-                                </ListGroup>
-
-                            </Col>
-                            {/* rent button associated */}
-                            <Form.Group>
-                                <Row>
-                                    <Form.Control id='CustID' placeholder='Customer ID' value={customerId} onChange={handleCustomerIdChange}></Form.Control>
-                                    <Button onClick={() => rentCustomerMovie(filmDetails)}>Rent</Button>
-                                </Row>
-                            </Form.Group>
-                        </Row>
-                    ) : (
-                        <p>Loading film details...</p>
-                    )}
+                    {/* <p>Customer ID: {customer[0].customer_id}</p> */}
+                    {/* <p>Customer First Name: {customer[0].first_name}</p>
+                    <p>Customer Last Name: {customer[0].last_name}</p>
+                    <p>Customer Email: {customer[0].email}</p>
+                    <p>Customer Phone: {customer[0].phone}</p> */}
+                    <Table>
+                        <tbody>
+                            {Object.keys(dummy).map((key, index) => (
+                                index <= 0 && (
+                                    <tr key={index}>
+                                        <td>{dummy[key].customer_id}</td>
+                                        <td>first</td>
+                                        <td>{dummy[key].first_name}</td>
+                                        <td>last</td>
+                                        <td>{dummy[key].last_name}</td>
+                                        <td>email</td>
+                                        <td>{dummy[key].email}</td>
+                                        <td>phone</td>
+                                        <td>{dummy[key].phone}</td>
+                                    </tr>
+                                )
+                            ))}
+                        </tbody>
+                    </Table>
+                    <Table>
+                        <thead>
+                            <tr>
+                                <th>Rental date</th>
+                                <th>Return date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.keys(dummy).map((key, index) => (
+                                <tr key={index}>
+                                    <td>{dummy[key].rental_date}</td>
+                                    <td>{dummy[key].return_date}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>
@@ -297,13 +317,13 @@ export default function Customer() {
                         </Button>
                     </Col >
                     <Col>
-                        <Button variant="outline-primary" id="add-customer-button" onClick={handleAddUser}>
-                            Add user
+                        <Button variant="outline-primary" id="add-customer-button" onClick={handleAddAddress}>
+                            Add Address
                         </Button>
                         {/* this is for the customer */}
                         <Modal show={showModal} onHide={() => setShowModal(false)}>
                             <Modal.Header closeButton>
-                                <Modal.Title>Enter User Responses</Modal.Title>
+                                <Modal.Title>Enter Address</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 {/* Add input fields for 5 responses */}
@@ -357,7 +377,7 @@ export default function Customer() {
                                 <Button variant="secondary" onClick={() => setShowModal(false)}>
                                     Close
                                 </Button>
-                                <Button variant="primary" onClick={handleSaveResponses}>
+                                <Button variant="primary" onClick={handleSaveAddress}>
                                     Save Responses
                                 </Button>
                             </Modal.Footer>
@@ -394,7 +414,6 @@ export default function Customer() {
                                         <td className='justify-content-center d-flex '>
                                             <div className="d-flex gap-1 py-1">
                                                 <Button variant='outline-success' className='m-1 px-5' onClick={() => showCustomerModal(customer)}>view</Button>
-                                                {/* <CsutomerDetailsModal></CsutomerDetailsModal> */}
                                                 <Button variant='outline-dark' className='m-1 px-5'>edit</Button>
                                                 <Button variant='outline-danger' className='m-1 px-5' onClick={() => handleDeleteCustomer(customer.customer_id)}>delete</Button>
                                             </div>
@@ -405,6 +424,7 @@ export default function Customer() {
                         </Table>
                     )}
                 </Row>
+                <CustomerDetailsModal></CustomerDetailsModal>
                 <Row>
                     <Pagination>
                         {pageNumbers.map(number => (
