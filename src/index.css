@@ -1,0 +1,103 @@
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+
+    .form-control-dark {
+        background-color: #333;
+        border-color: #4f4f4f;
+        color: #e0e0e0;
+    }
+
+    .form-control-dark:focus {
+        background-color: #4f4f4f;
+        border-color: #8c8c8c;
+        color: #ffffff;
+    }
+
+    .form-check-input:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .form-check-input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-check-label {
+        color: #e0e0e0;
+    }
+
+    .modal-width {
+        background-color: #333;
+        color: #fff;
+    }
+
+    #filmSearchBar {
+        background-color: #222;
+        color: #ddd;
+    }
+
+    .btn-outline-primary {
+        border-color: #007bff;
+        color: #007bff;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: #fff;
+    }
+
+    .btn-outline-dark {
+        border-color: #fff;
+        color: #fff;
+    }
+
+    .btn-outline-dark:hover {
+        background-color: #fff;
+        color: #222;
+    }
+
+    /* .table-dark {
+        background-color: #343a40;
+        color: #fff;
+    }
+
+    .table-dark th,
+    .table-dark td,
+    .table-dark thead th {
+        border-color: #454d55;
+    }
+
+    .table-dark tbody+tbody {
+        border-top-color: #454d55;
+    }
+
+    .table-dark.table-bordered {
+        border-color: #454d55;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .dark-mode-background {
+        background-color: #121212;
+    } */
+}

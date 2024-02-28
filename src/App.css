@@ -1,4 +1,15 @@
-#filmSearchBar{
+.modal-width {
+    min-width: 60vw;
+}
+
+@media (prefers-color-scheme: dark) {
+    .dark-mode-background {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+}
+
+#filmSearchBar {
     min-width: 150px;
     max-width: 88vw;
 }

@@ -1,6 +1,7 @@
 import { Modal, Row, Form, InputGroup, Button, Col, Table, Spinner, ListGroup, Container, Pagination, ProgressBar } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-// import axios from 'axios'; // Assuming you are using axios for HTTP requests
+import { faCouch, faUsers, faMapLocation, faMagnifyingGlass, faReceipt, faPencil, faTrash, faCircleXmark, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Customer() {
     const [customerSearch, setCustomerSearch] = useState('');
@@ -18,12 +19,17 @@ export default function Customer() {
     const [showCustomerDetailsModal, setShowCustomerDetailsModal] = useState(false);
     const [customerDetails, setCustomerDetails] = useState({});
     const [dummy, setDummy] = useState({});
+    const [address, setAddress] = useState('');
+    const [district, setDistrict] = useState('');
+    const [city, setCity] = useState('');
+    const [postalCode, setPostalCode] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [userResponses, setUserResponses] = useState({
         address: '',
         district: '',
         city: '',
         postalCode: '',
-        phoneNumber: '',
+        phoneNumber: ''
     });
 
     const handleInputChange = (e) => {
@@ -133,18 +139,44 @@ export default function Customer() {
 
     const handleSaveAddress = async () => {
         try {
+            const { address, district, city_id, postal_code, phone } = userResponses; // Destructure the required fields
+    
+            if (!userResponses.address || !userResponses.district || !userResponses.city || !userResponses.postalCode || !userResponses.phoneNumber) {
+                console.error('Missing required fields');
+                console.log("address", userResponses.address);
+                console.log("district", userResponses.district);
+                console.log("city", userResponses.city);
+                console.log("postalCode", userResponses.postalCode);
+                console.log("phone", userResponses.phoneNumber);
+                return;
+            }
+    
+            console.log("address", userResponses.address);
+                console.log("district", userResponses.district);
+                console.log("city", userResponses.city);
+                console.log("postalCode", userResponses.postalCode);
+                console.log("phone", userResponses.phoneNumber);
+
+            const requestData = {
+                user_address: userResponses.address,
+                user_district: userResponses.district,
+                user_city_id: userResponses.city,
+                user_postal_code: userResponses.postal_code,
+                user_phone: userResponses.phone
+            };
+    
             const response = await fetch('http://localhost:3001/addNewCustomerInfo', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(userResponses),
+                body: JSON.stringify(requestData),
             });
-
+    
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-
+    
             console.log('Responses saved successfully.');
             setShowModal(false); // Close the modal after successful save
         } catch (error) {
@@ -152,11 +184,11 @@ export default function Customer() {
         }
     };
 
-    const handleChange = (e) => {
-        const { id, value } = e.target;
+    const handleChange = (e, field) => {
+        const { value } = e.target;
         setUserResponses((prevResponses) => ({
             ...prevResponses,
-            [id]: value,
+            [field]: value,
         }));
     };
 
@@ -214,51 +246,44 @@ export default function Customer() {
 
     const CustomerDetailsModal = () => {
         return (
-            <Modal size="lg" centered show={showCustomerDetailsModal} onHide={handleCloseModal}>
+            <Modal size="lg" dialogClassName="modal-width" centered show={showCustomerDetailsModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Customer Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {/* <p>Customer ID: {customer[0].customer_id}</p> */}
-                    {/* <p>Customer First Name: {customer[0].first_name}</p>
-                    <p>Customer Last Name: {customer[0].last_name}</p>
-                    <p>Customer Email: {customer[0].email}</p>
-                    <p>Customer Phone: {customer[0].phone}</p> */}
-                    <Table>
-                        <tbody>
+                    <Row className='align-items-center'>
+                        <Col lg={4}>
                             {Object.keys(dummy).map((key, index) => (
                                 index <= 0 && (
-                                    <tr key={index}>
-                                        <td>{dummy[key].customer_id}</td>
-                                        <td>first</td>
-                                        <td>{dummy[key].first_name}</td>
-                                        <td>last</td>
-                                        <td>{dummy[key].last_name}</td>
-                                        <td>email</td>
-                                        <td>{dummy[key].email}</td>
-                                        <td>phone</td>
-                                        <td>{dummy[key].phone}</td>
-                                    </tr>
+                                    <ListGroup variant="flush" key={index}>
+                                        <ListGroup.Item className='py-2'><h4>Customer ID: </h4>{dummy[key].customer_id}</ListGroup.Item>
+                                        <ListGroup.Item className='py-2'><h4>First: </h4>{dummy[key].first_name}</ListGroup.Item>
+                                        <ListGroup.Item className='py-2'><h4>Last: </h4>{dummy[key].last_name}</ListGroup.Item>
+                                        <ListGroup.Item className='py-2'><h4>Email: </h4>{dummy[key].email}</ListGroup.Item>
+                                        <ListGroup.Item className='py-2'><h4>Phone: </h4>{dummy[key].phone}</ListGroup.Item>
+                                    </ListGroup>
                                 )
                             ))}
-                        </tbody>
-                    </Table>
-                    <Table>
-                        <thead>
-                            <tr>
-                                <th>Rental date</th>
-                                <th>Return date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Object.keys(dummy).map((key, index) => (
-                                <tr key={index}>
-                                    <td>{dummy[key].rental_date}</td>
-                                    <td>{dummy[key].return_date}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                        </Col>
+                        <Col lg={8}>
+                            <Table striped bordered hover>
+                                <thead>
+                                    <tr>
+                                        <th>Rental Date</th>
+                                        <th>Return Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Object.keys(dummy).map((key, index) => (
+                                        <tr key={index}>
+                                            <td>{dummy[key].rental_date}</td>
+                                            <td>{dummy[key].return_date}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </Col>
+                    </Row>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>
@@ -272,16 +297,31 @@ export default function Customer() {
     return (
         <>
             <Container>
+                <Row className='my-3 align-items-center justify-content-center'>
+                    <Col>
+                        <h1 className='text-center text-primary'><FontAwesomeIcon icon={faCouch} /> Customers</h1>
+                    </Col>
+                    <Col lg={3}>
+                        <div className='d-grid gap-4'>
+                            <Button variant="outline-primary" className='p-3' id="add-customer-button" onClick={handleAddCustomer}>
+                                <FontAwesomeIcon icon={faUsers} /> Add Customer
+                            </Button>
+                            <Button variant="outline-primary" className='p-3' id="add-customer-button" onClick={handleAddAddress}>
+                                <FontAwesomeIcon icon={faMapLocation} />     Add Address
+                            </Button>
+                        </div>
+                    </Col >
+                </Row>
                 <Row className='justify-content-center'>
                     <Col>
-                        <h1>Customers</h1>
-
                         <Form className='pt-2 pb-4'>
                             <InputGroup size="lg" className="align-items-center">
                                 <Form.Control
+                                        className='form-control-dark'
+
                                     id='searchCustomer'
-                                    placeholder="Customer First Name"
-                                    aria-label=""
+                                    placeholder="Search Customers by First Name"
+                                    aria-label="Search Customers by First Name"
                                     aria-describedby="customerNameFilter"
                                     value={customerSearch}
                                     onChange={handleInputChange}
@@ -302,84 +342,84 @@ export default function Customer() {
                                     checked={filterByLName}
                                     onChange={handleCustomerLNameFilter}
                                 />
+                                <Button variant="outline-danger" id="search-customer-button" onClick={handleSearch}>
+                                    Find <FontAwesomeIcon icon={faMagnifyingGlass} />
+                                </Button>
                             </InputGroup>
-                            <Button variant="outline-danger" id="search-customer-button" onClick={handleSearch}>
-                                Find
-                            </Button>
                         </Form>
 
                     </Col>
                 </Row>
                 <Row>
+
                     <Col>
-                        <Button variant="outline-primary" id="add-customer-button" onClick={handleAddCustomer}>
-                            Add Customer
-                        </Button>
-                    </Col >
-                    <Col>
-                        <Button variant="outline-primary" id="add-customer-button" onClick={handleAddAddress}>
-                            Add Address
-                        </Button>
                         {/* this is for the customer */}
-                        <Modal show={showModal} onHide={() => setShowModal(false)}>
-                            <Modal.Header closeButton>
+                        <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName=''>
+                            <Modal.Header closeButton className='dark-mode-background'>
                                 <Modal.Title>Enter Address</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body>
+                            <Modal.Body className='dark-mode-background'>
                                 {/* Add input fields for 5 responses */}
                                 <Form.Group controlId="addressResponse">
                                     <Form.Label>Address</Form.Label>
                                     <Form.Control
                                         type="text"
+                                        className='form-control-dark'
                                         placeholder="Enter your address"
                                         value={userResponses.address}
-                                        onChange={handleChange}
+                                        onChange={(e) => handleChange(e, 'address')}
                                     />
                                 </Form.Group>
                                 <Form.Group controlId="districtResponse">
                                     <Form.Label>District</Form.Label>
                                     <Form.Control
                                         type="text"
+                                        className='form-control-dark'
                                         placeholder="Enter your district"
                                         value={userResponses.district}
-                                        onChange={handleChange}
+                                        onChange={(e) => handleChange(e, 'district')}
                                     />
                                 </Form.Group>
                                 <Form.Group controlId="cityResponse">
                                     <Form.Label>City</Form.Label>
                                     <Form.Control
                                         type="text"
+                                        className='form-control-dark'
                                         placeholder="Enter your city"
                                         value={userResponses.city}
-                                        onChange={handleChange}
+                                        onChange={(e) => handleChange(e, 'city')}
                                     />
                                 </Form.Group>
                                 <Form.Group controlId="postalResponse">
                                     <Form.Label>Postal Code</Form.Label>
                                     <Form.Control
-                                        type="text"
+                                        type="number"
+                                        className='form-control-dark'
                                         placeholder="Enter your zip-code"
                                         value={userResponses.postalCode}
-                                        onChange={handleChange}
+                                        onChange={(e) => handleChange(e, 'postalCode')}
                                     />
                                 </Form.Group>
                                 <Form.Group controlId="phoneResponse">
                                     <Form.Label>Phone Number</Form.Label>
                                     <Form.Control
-                                        type="text"
+                                        type="tel"
+                                        className='form-control-dark'
                                         placeholder="Enter your phone number"
                                         value={userResponses.phoneNumber}
-                                        onChange={handleChange}
+                                        onChange={(e) => handleChange(e, 'phoneNumber')}
                                     />
                                 </Form.Group>
                             </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={() => setShowModal(false)}>
-                                    Close
+                            <Modal.Footer className='justify-content-between '>
+
+                                <Button variant="outline-secondary" className='mx-2 p-2' onClick={() => setShowModal(false)}>
+                                    Close&nbsp;&nbsp; <FontAwesomeIcon icon={faCircleXmark} />
                                 </Button>
-                                <Button variant="primary" onClick={handleSaveAddress}>
-                                    Save Responses
+                                <Button variant="outline-primary" className='mx-2 p-2' onClick={handleSaveAddress}>
+                                    Save Responses&nbsp;&nbsp;  <FontAwesomeIcon icon={faPaperPlane} />
                                 </Button>
+
                             </Modal.Footer>
                         </Modal>
 
@@ -390,38 +430,40 @@ export default function Customer() {
                     </Col >
                 </Row >
 
-                <Row>
+                <Row className='justify-content-center'>
                     {isLoading ? (
                         <Spinner animation="border" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </Spinner>
                     ) : (
-                        <Table striped bordered hover>
-                            <thead className='h4'>
-                                <tr>
-                                    <th className='text-center'>Id</th>
-                                    <th className='text-center'>First Name</th>
-                                    <th className='text-center'>Last Name</th>
-                                    <th className="text-center">Menu</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {currentCustomers.map((customer, index) => (
-                                    <tr key={index} className='align-middle'>
-                                        <td>{customer.customer_id}</td>
-                                        <td className='text-danger h6'>{customer.first_name}</td>
-                                        <td className='text-center'>{customer.last_name}</td>
-                                        <td className='justify-content-center d-flex '>
-                                            <div className="d-flex gap-1 py-1">
-                                                <Button variant='outline-success' className='m-1 px-5' onClick={() => showCustomerModal(customer)}>view</Button>
-                                                <Button variant='outline-dark' className='m-1 px-5'>edit</Button>
-                                                <Button variant='outline-danger' className='m-1 px-5' onClick={() => handleDeleteCustomer(customer.customer_id)}>delete</Button>
-                                            </div>
-                                        </td>
+                        <Col>
+                            <Table striped bordered hover className='table-dark'>
+                                <thead className='h4'>
+                                    <tr>
+                                        <th className='text-center'>Id</th>
+                                        <th className=''>First Name</th>
+                                        <th className=''>Last Name</th>
+                                        <th className="text-center">Menu</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                                </thead>
+                                <tbody>
+                                    {currentCustomers.map((customer, index) => (
+                                        <tr key={index} className='align-middle'>
+                                            <td>{customer.customer_id}</td>
+                                            <td className='text-danger h5'>{customer.first_name}</td>
+                                            <td className='h5'>{customer.last_name}</td>
+                                            <td className='justify-content-center d-flex '>
+                                                <div className="d-flex gap-1 py-1">
+                                                    <Button variant='outline-success' className='m-1 px-5' onClick={() => showCustomerModal(customer)}><FontAwesomeIcon icon={faReceipt} />&nbsp;&nbsp;view</Button>
+                                                    <Button variant='outline-dark' className='m-1 px-5'><FontAwesomeIcon icon={faPencil} />&nbsp;&nbsp;edit</Button>
+                                                    <Button variant='outline-danger' className='m-1 px-5' onClick={() => handleDeleteCustomer(customer.customer_id)}><FontAwesomeIcon icon={faTrash} />&nbsp;&nbsp;delete</Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </Col>
                     )}
                 </Row>
                 <CustomerDetailsModal></CustomerDetailsModal>

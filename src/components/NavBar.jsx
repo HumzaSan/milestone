@@ -1,4 +1,4 @@
-import { faTicket } from '@fortawesome/free-solid-svg-icons';
+import { faTicket, faUsers, faVideo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
@@ -15,8 +15,8 @@ export default function NavBar() {
           <Navbar.Toggle aria-controls="responsive-navbar-nav" className='bg-warning' />
           <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-end">
             <Nav>
-              <Nav.Link href="/search" className=' text-warning'>Movies</Nav.Link>
-              <Nav.Link href="/customer" className=' text-warning'>Customer</Nav.Link>
+              <Nav.Link href="/search" className=' text-warning'><FontAwesomeIcon icon={faVideo} />&nbsp;Movies</Nav.Link>
+              <Nav.Link href="/customer" className=' text-warning'><FontAwesomeIcon icon={faUsers} />&nbsp;Customer</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Navbar>
