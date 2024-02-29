@@ -29,7 +29,6 @@ export default function Customer() {
         postalCode: '',
         phoneNumber: ''
     });
-    const [phoneNumber, setPhoneNumber] = useState('');
     const [showCustomerEditModal, setShowCustomerEditModal] = useState(true);
 
     const handleInputChange = (e) => {
@@ -112,13 +111,12 @@ export default function Customer() {
     const handleDeleteCustomer = async (customerID) => {
         try {
             const response = await fetch(`http://localhost:3001/deleteCustomerById/${encodeURIComponent(customerID)}`, {
-                method: 'DELETE', // Assuming the backend expects a DELETE request for deleting a customer
+                method: 'DELETE', 
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             console.log(`Customer with ID: ${customerID} deleted successfully.`);
-            // Optionally, refresh the search results to reflect the deletion
             setSearchResults(searchResults.filter(customer => customer.customer_id !== customerID));
         } catch (error) {
             console.error('Error deleting customer:', error);
@@ -187,7 +185,7 @@ export default function Customer() {
           }
       
           console.log('Responses saved successfully.');
-          setShowModal(false); // Close the modal after successful save
+          setShowModal(false); 
         } catch (error) {
           console.error('Error saving responses:', error);
         }
@@ -203,22 +201,22 @@ export default function Customer() {
 
     useEffect(() => {
         const fetchSearchResults = async () => {
-            setIsLoading(true); // Start loading
+            setIsLoading(true); 
             try {
-                // Adjust the URL and parameters according to your API
+                
                 const response = await fetch(`http://localhost:3001/showAllCustomers`);
                 const data = await response.json();
-                setSearchResults(data); // Assuming the response data is the array of search results
+                setSearchResults(data); 
             } catch (error) {
                 console.error('Failed to fetch search results:', error);
-                setSearchResults([]); // Reset search results on error
+                setSearchResults([]); 
             } finally {
-                setIsLoading(false); // End loading
+                setIsLoading(false);
             }
         };
 
         fetchSearchResults();
-    }, []); // Empty dependency array makes this effect run only once on component mount
+    }, []); 
 
     // Calculate the current customers to display
     const indexOfLastCustomer = currentPage * customersPerPage;
@@ -556,6 +554,7 @@ export default function Customer() {
                     )}
                 </Row>
                 <CustomerDetailsModal></CustomerDetailsModal>
+                <customerEditModal></customerEditModal>
                 <Row>
                     <Pagination>
                         {pageNumbers.map(number => (

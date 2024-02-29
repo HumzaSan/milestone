@@ -14,6 +14,8 @@ export default function SearchBar({ query }) {
     const [userResponses, setUserResponses] = useState({
         firstName: ''
     });
+    
+    
 
     useEffect(() => {
         if (movieTitle || filterByActor || filterByGenre) {
@@ -102,21 +104,34 @@ export default function SearchBar({ query }) {
 
     // rent button ///////////////
     const rentCustomerMovie = async (filmDetails) => {
-
         const customerInfo = {
-            film_id: filmDetails.film_id,
-            customer_id: customerId
+          film_id: filmDetails.film_id,
+          customer_id: customerId
         };
-        const result = await fetch('http://localhost:3001/customerMovieRental/${customer_id}/', {
+        console.log("this is my customer id", filmDetails.film_id);
+        console.log("this is my customer id", film_id);
+        console.log("this is my film id", customerId);
+    
+        try {
+          const result = await fetch(`http://localhost:3001/customerMovieRental/${customerInfo.customer_id}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify(customerInfo)
-        });
-        console.log(result)
-        const data = await result.json()
-    };
+          });
+    
+          if (!result.ok) {
+            throw new Error(`HTTP error! Status: ${result.status}`);
+          }
+    
+          const data = await result.json();
+          console.log(data);
+    
+        } catch (error) {
+          console.error('Error renting movie:', error);
+        }
+      };
     ///////////////////////////////
 
     const handleChange = (e, field) => {
@@ -151,28 +166,17 @@ export default function SearchBar({ query }) {
 
                             </Col>
                             {/* rent button associated */}
-                            <Form.Group>
-                                <Row>
-                                    {/* <Form.Control
-                                        id='CustID'
-                                        placeholder='Customer ID'
-                                        value={customerId}
-                                        onChange={handleCustomerIdChange}
-                                        onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()} // prevent Enter key
-                                    /> */}
-                                    <Form.Group controlId="firstNameResponse">
-                                        <Form.Label>Rent</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            className='form-control-dark'
-                                            placeholder="Customer ID"
-                                            value={customerId}
-                                            onChange={(e) => handleChange(e, 'customerId')}
-                                            onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()} // prevent Enter key
-                                        />
-                                    </Form.Group>
-                                    <Button onClick={() => rentCustomerMovie(filmDetails)}>Rent</Button>
-                                </Row>
+                            <Form.Group controlId="CustID">
+                                <Form.Label>Rent</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    className='form-control-dark'
+                                    placeholder="Customer ID"
+                                    value={customerId}
+                                    onChange={(e) => setCustomerId(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
+                                />
+                                <Button onClick={() => rentCustomerMovie(filmDetails)}>Rent</Button>
                             </Form.Group>
                         </Row>
                     ) : (
