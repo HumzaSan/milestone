@@ -19,18 +19,18 @@ export default function Customer() {
     const [showCustomerDetailsModal, setShowCustomerDetailsModal] = useState(false);
     const [customerDetails, setCustomerDetails] = useState({});
     const [dummy, setDummy] = useState({});
-    const [address, setAddress] = useState('');
-    const [district, setDistrict] = useState('');
-    const [city, setCity] = useState('');
-    const [postalCode, setPostalCode] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
     const [userResponses, setUserResponses] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
         address: '',
         district: '',
         city: '',
         postalCode: '',
         phoneNumber: ''
     });
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [showCustomerEditModal, setShowCustomerEditModal] = useState(true);
 
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
@@ -139,50 +139,59 @@ export default function Customer() {
 
     const handleSaveAddress = async () => {
         try {
-            const { address, district, city_id, postal_code, phone } = userResponses; // Destructure the required fields
-    
-            if (!userResponses.address || !userResponses.district || !userResponses.city || !userResponses.postalCode || !userResponses.phoneNumber) {
-                console.error('Missing required fields');
-                console.log("address", userResponses.address);
-                console.log("district", userResponses.district);
-                console.log("city", userResponses.city);
-                console.log("postalCode", userResponses.postalCode);
-                console.log("phone", userResponses.phoneNumber);
-                return;
-            }
-    
-            console.log("address", userResponses.address);
-                console.log("district", userResponses.district);
-                console.log("city", userResponses.city);
-                console.log("postalCode", userResponses.postalCode);
-                console.log("phone", userResponses.phoneNumber);
-
-            const requestData = {
-                user_address: userResponses.address,
-                user_district: userResponses.district,
-                user_city_id: userResponses.city,
-                user_postal_code: userResponses.postal_code,
-                user_phone: userResponses.phone
-            };
-    
-            const response = await fetch('http://localhost:3001/addNewCustomerInfo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestData),
-            });
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-    
-            console.log('Responses saved successfully.');
-            setShowModal(false); // Close the modal after successful save
+          const { firstName, lastName, email, address, district, city, postalCode, phoneNumber } = userResponses; // Destructure the required fields
+      
+          if (!address || !district || !city || !postalCode || !phoneNumber || !firstName || !lastName || !email) {
+            console.error('Missing required fields');
+            console.log("firstName", firstName);
+            console.log("lastName", lastName);
+            console.log("email", email);
+            console.log("address", address);
+            console.log("district", district);
+            console.log("city", city);
+            console.log("postalCode", postalCode);
+            console.log("phone", phoneNumber);
+            return;
+          }
+          
+        console.log("firstName", firstName);
+        console.log("lastName", lastName);
+        console.log("email", email);
+          console.log("address", address);
+          console.log("district", district);
+          console.log("city", city);
+          console.log("postalCode", postalCode);
+          console.log("phone", phoneNumber);
+      
+          const requestData = {
+            user_first_name: firstName,
+            user_last_name: lastName,
+            user_email: email,
+            user_address: address,
+            user_district: district,
+            user_city_id: city,
+            user_postal_code: postalCode,
+            user_phone: phoneNumber
+          };
+      
+          const response = await fetch('http://localhost:3001/addNewCustomerInfo', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+          });
+      
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+      
+          console.log('Responses saved successfully.');
+          setShowModal(false); // Close the modal after successful save
         } catch (error) {
-            console.error('Error saving responses:', error);
+          console.error('Error saving responses:', error);
         }
-    };
+      };
 
     const handleChange = (e, field) => {
         const { value } = e.target;
@@ -293,6 +302,61 @@ export default function Customer() {
             </Modal>
         );
     }
+
+    const showEditModal = async (customer) => {
+        setShowCustomerEditModal(true);
+        customerEditModal(customer);
+    }
+
+    const handleEditModal = () => setShowCustomerEditModal(false);
+
+    const customerEditModal = () => {
+        return (
+            <Modal size="lg" dialogClassName="modal-width" centered show={showCustomerEditModal} onHide={handleEditModal}>
+                <Modal.Header>
+                    <Modal.Title>Edit Customer</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row>
+                        <Col>
+                        <Form className='pt-2 pb-4'>
+                            <InputGroup size="lg" className="align-items-center">
+                                <Form.Control
+                                        className='form-control-dark'
+
+                                    id='searchCustomer'
+                                    placeholder="Search Customers by First Name"
+                                    aria-label="Search Customers by First Name"
+                                    aria-describedby="customerNameFilter"
+                                    value={customerSearch}
+                                    //onChange={handleInputChange}
+                                />
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Filter by ID"
+                                    className='mx-4'
+                                    id="customerIDFilter"
+                                    checked={filterByID}
+                                    //onChange={handleIDFilter}
+                                />
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Filter by Last Name"
+                                    className='mx-4'
+                                    id="customerNameFilter"
+                                    checked={filterByLName}
+                                    //onChange={handleCustomerLNameFilter}
+                                />
+                                <Button variant="outline-danger" id="search-customer-button" onClick={handleSearch}>
+                                    Find <FontAwesomeIcon icon={faMagnifyingGlass} />
+                                </Button>
+                            </InputGroup>
+                        </Form>
+                        </Col>
+                    </Row>
+                </Modal.Body>
+            </Modal>
+    )};
     //////////////////////////////////////
     return (
         <>
@@ -360,6 +424,36 @@ export default function Customer() {
                             </Modal.Header>
                             <Modal.Body className='dark-mode-background'>
                                 {/* Add input fields for 5 responses */}
+                                <Form.Group controlId="firstNameResponse">
+                                    <Form.Label>First Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        className='form-control-dark'
+                                        placeholder="Enter your first name"
+                                        value={userResponses.firstName}
+                                        onChange={(e) => handleChange(e, 'firstName')}
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="lastNameResponse">
+                                    <Form.Label>Last Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        className='form-control-dark'
+                                        placeholder="Enter your last name"
+                                        value={userResponses.lastName}
+                                        onChange={(e) => handleChange(e, 'lastName')}
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="emailResponse">
+                                    <Form.Label>Email Address</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        className='form-control-dark'
+                                        placeholder="Enter your email address"
+                                        value={userResponses.email}
+                                        onChange={(e) => handleChange(e, 'email')}
+                                    />
+                                </Form.Group>
                                 <Form.Group controlId="addressResponse">
                                     <Form.Label>Address</Form.Label>
                                     <Form.Control
@@ -422,11 +516,6 @@ export default function Customer() {
 
                             </Modal.Footer>
                         </Modal>
-
-
-
-
-
                     </Col >
                 </Row >
 
@@ -455,7 +544,7 @@ export default function Customer() {
                                             <td className='justify-content-center d-flex '>
                                                 <div className="d-flex gap-1 py-1">
                                                     <Button variant='outline-success' className='m-1 px-5' onClick={() => showCustomerModal(customer)}><FontAwesomeIcon icon={faReceipt} />&nbsp;&nbsp;view</Button>
-                                                    <Button variant='outline-dark' className='m-1 px-5'><FontAwesomeIcon icon={faPencil} />&nbsp;&nbsp;edit</Button>
+                                                    <Button variant='outline-dark' className='m-1 px-5' onClick={() => showEditModal(customer)}><FontAwesomeIcon icon={faPencil} />&nbsp;&nbsp;edit</Button>
                                                     <Button variant='outline-danger' className='m-1 px-5' onClick={() => handleDeleteCustomer(customer.customer_id)}><FontAwesomeIcon icon={faTrash} />&nbsp;&nbsp;delete</Button>
                                                 </div>
                                             </td>

@@ -11,6 +11,9 @@ export default function SearchBar({ query }) {
     const [selectedFilm, setSelectedFilm] = useState(null);
     const [filmDetails, setFilmDetails] = useState({});
     const [customerId, setCustomerId] = useState('');
+    const [userResponses, setUserResponses] = useState({
+        firstName: ''
+    });
 
     useEffect(() => {
         if (movieTitle || filterByActor || filterByGenre) {
@@ -99,6 +102,7 @@ export default function SearchBar({ query }) {
 
     // rent button ///////////////
     const rentCustomerMovie = async (filmDetails) => {
+
         const customerInfo = {
             film_id: filmDetails.film_id,
             customer_id: customerId
@@ -114,6 +118,15 @@ export default function SearchBar({ query }) {
         const data = await result.json()
     };
     ///////////////////////////////
+
+    const handleChange = (e, field) => {
+        const { value } = e.target;
+        setUserResponses((prevResponses) => ({
+            ...prevResponses,
+            [field]: value,
+        }));
+    };
+
     const FilmDetailsModal = () => {
         return (
             <Modal size="lg" centered show={modal} onHide={handleCloseModal}>
@@ -129,18 +142,35 @@ export default function SearchBar({ query }) {
                                 <p className='mt-2'><b>Special Features:</b> {filmDetails.special_features}</p>
                             </Col>
                             <Col>
-                            <ListGroup variant="flush">
-                                <ListGroup.Item><b>Release Year</b> {filmDetails.release_year}</ListGroup.Item>
-                                <ListGroup.Item><b>Genre</b> {filmDetails.name}</ListGroup.Item>
-                                <ListGroup.Item><b>Rating</b> {filmDetails.rating}</ListGroup.Item>
-                                <ListGroup.Item><b>Rental Rate</b> <span className="text-success">${filmDetails.rental_rate}</span></ListGroup.Item>
-                            </ListGroup>
-                                
+                                <ListGroup variant="flush">
+                                    <ListGroup.Item><b>Release Year</b> {filmDetails.release_year}</ListGroup.Item>
+                                    <ListGroup.Item><b>Genre</b> {filmDetails.name}</ListGroup.Item>
+                                    <ListGroup.Item><b>Rating</b> {filmDetails.rating}</ListGroup.Item>
+                                    <ListGroup.Item><b>Rental Rate</b> <span className="text-success">${filmDetails.rental_rate}</span></ListGroup.Item>
+                                </ListGroup>
+
                             </Col>
                             {/* rent button associated */}
                             <Form.Group>
                                 <Row>
-                                    <Form.Control id='CustID' placeholder='Customer ID' value={customerId} onChange={handleCustomerIdChange}></Form.Control>
+                                    {/* <Form.Control
+                                        id='CustID'
+                                        placeholder='Customer ID'
+                                        value={customerId}
+                                        onChange={handleCustomerIdChange}
+                                        onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()} // prevent Enter key
+                                    /> */}
+                                    <Form.Group controlId="firstNameResponse">
+                                        <Form.Label>Rent</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            className='form-control-dark'
+                                            placeholder="Customer ID"
+                                            value={customerId}
+                                            onChange={(e) => handleChange(e, 'customerId')}
+                                            onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()} // prevent Enter key
+                                        />
+                                    </Form.Group>
                                     <Button onClick={() => rentCustomerMovie(filmDetails)}>Rent</Button>
                                 </Row>
                             </Form.Group>
@@ -168,33 +198,33 @@ export default function SearchBar({ query }) {
                     <h1 className="text-danger my-2">Search Movies</h1>
                     <Form className='pt-2 pb-4'>
                         {/* <InputGroup size="lg" className="align-items-center"> */}
-                            <Form.Control
-                                id='filmSearchBar'
-                                placeholder="Film Search"
-                                aria-label="Search Movies"
-                                aria-describedby="movie-search-input"
-                                value={movieTitle}
-                                onChange={handleInputChange}
-                            />
-                            <Form.Check
-                                type="checkbox"
-                                label="Filter by Actor"
-                                className='mx-4'
-                                id="actorFilter"
-                                checked={filterByActor}
-                                onChange={handleActorFilter}
-                            />
-                            <Form.Check
-                                type="checkbox"
-                                label="Filter by genre"
-                                className='mx-4'
-                                id="actorGenre"
-                                checked={filterByGenre}
-                                onChange={handleGenreFilter}
-                            />
-                            <Button variant="outline-danger" id="search-movies-button" onClick={handleSearch}>
-                                Find
-                            </Button>
+                        <Form.Control
+                            id='filmSearchBar'
+                            placeholder="Film Search"
+                            aria-label="Search Movies"
+                            aria-describedby="movie-search-input"
+                            value={movieTitle}
+                            onChange={handleInputChange}
+                        />
+                        <Form.Check
+                            type="checkbox"
+                            label="Filter by Actor"
+                            className='mx-4'
+                            id="actorFilter"
+                            checked={filterByActor}
+                            onChange={handleActorFilter}
+                        />
+                        <Form.Check
+                            type="checkbox"
+                            label="Filter by genre"
+                            className='mx-4'
+                            id="actorGenre"
+                            checked={filterByGenre}
+                            onChange={handleGenreFilter}
+                        />
+                        <Button variant="outline-danger" id="search-movies-button" onClick={handleSearch}>
+                            Find
+                        </Button>
                         {/* </InputGroup> */}
                     </Form>
                     <div>
